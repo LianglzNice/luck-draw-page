@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<title>大转盘</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<script type="text/javascript" src="js/jquery-1.12.3.min.js"></script>
+	<script type="text/javascript" src="js/jqueryRotate.2.2.js"></script>
+	<script type="text/javascript" src="js/size-conversion.js"></script>
+</head>
+<body>
+	<div class="bg">
+		<img src="images/bg.png" width="100%">
+		<div class="box">
+			<div class="turntable">
+				<img src="images/new.gif" width="100%">
+				<div class="rotate">
+					<img src="images/rotate.png" width="100%">
+					<div id="prize" class="prize"></div>
+				</div>
+				<div class="start"><img src="images/go.png" width="100%"></div>
+			</div>
+			<p class="describe">您今天还有3次抽奖次数</p>
+			<div class="result">
+				<img src="images/res.png" width="100%">
+				<div class="res">
+					<ul>
+						<li>
+							<p class="res_le">2332425251获得</p>
+							<p class="res_ri">现金红包2元 </p>
+						</li>
+						<li><p class="res_le">2332425252获得</p>
+							<p class="res_ri">现金红包2元 </p>
+						</li>
+						<li><p class="res_le">2332425253获得</p>
+							<p class="res_ri">现金红包2元 </p>
+						</li>
+						<li><p class="res_le">2332425254获得</p>
+							<p class="res_ri">现金红包2元 </p>
+						</li>
+						<li><p class="res_le">2332425255获得</p>
+							<p class="res_ri">现金红包2元 </p>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<!-- 弹窗 -->
+			<div class="bg_block" style="display: none;">
+				<div class="block">
+					<p class="tip">温馨提示</p>
+					<p class="content"></p>
+					<div class="submit" onclick="$('.bg_block').hide()">我知道了</div>
+				</div>
+			</div>
+			<!-- 登录弹窗 -->
+			<div class="bgs_block">
+				<div class="block">
+					<div class="c_tel">
+						<div class="c_telicon"><img src="images/ci_people.png" width="100%"></div>
+						<input class="c_ipt ci_ipt" type="text" placeholder="请输入您的手机号">
+					</div>
+					<div class="c_pwd">
+						<div class="c_pwdicon"><img src="images/ci_pwd.png" width="100%"></div>
+						<input class="c_pwdipt ci_ipt" type="text" placeholder="请输入验证码">
+						<div class="c_code" onClick="getCode(this)">获取验证码</div>
+					</div>
+					<div class="s_submit" onclick="$('.bgs_block').hide()">确定</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		//渲染转盘
+		//防止重复点击
+		var derail = true;
+		//剩余次数
+		var overCount = 3;
+		//奖项集合，逆时针排列
+		var prizeArr = [
+			{
+				img: 'images/icon1.png',
+				title: '谢谢参与'
+			},{
+				img: 'images/icon3.png',
+				title: '5元券'
+			},{
+				img: 'images/icon1.png',
+				title: '谢谢参与'
+			},{
+				img: 'images/icon2.png',
+				title: '红包2元'
+			},{
+				img: 'images/icon3.png',
+				title: '5元券'
+			},{
+				img: 'images/icon1.png',
+				title: '谢谢参与'
+			},{
+				img: 'images/icon2.png',
+				title: '红包2元'
+			},{
+				img: 'images/icon3.png',
+				title: '5元券'
+			}
+		];
+		for(var item in prizeArr){
+			var html = '<div class="prizeitem" style="transform:rotate('+ item*-45 +'deg)">' +
+							'<div class="prize_img"><img src="'+ prizeArr[item].img +'"></div>' +
+							'<p class="prize_title">'+ prizeArr[item].title +'</p>' +
+					   '</div>';
+			$('.prize').append(html);
+		}
+
+		//抽奖方法
+		$('.start').click(function(){
+			if(derail){
+				derail = false;
+
+				if(overCount < 1){
+					$('.bg_block').show();
+					$('.content').text('您暂无抽奖次数，请先通过aWiFi免费热点登录后可获得三次抽奖机会');
+					derail = true;
+					return;
+				}
+				overCount--;
+				$('.describe').text('您今天还有'+ overCount +'次抽奖次数'); //今日剩余次数
+
+				var chance = Math.floor(Math.random() * 100);  //设置概率 0-99
+				console.log(chance);
+				if(chance < 80){
+					//小于80 谢谢参与	
+					rotate80('.rotate');
+
+				}else if(chance >= 80 && chance < 95){
+					//大于等于80小于95 获得5元券
+					rotate80And95('.rotate');
+
+				}else{
+					//大于95 获得红包2元
+					rotate95('.rotate');
+				}
+			}
+		})
+
+		function rotate80(el){
+			var arr = [0,2,5];
+			var random = Math.floor(Math.random() * arr.length);
+			rotateDisc(el, arr[random], '很遗憾，谢谢参与');
+		}
+		function rotate80And95(el){
+			var arr = [1,4,7];
+			var random = Math.floor(Math.random() * arr.length);
+			rotateDisc(el, arr[random], '恭喜你，获得5元券');
+		}
+		function rotate95(el){
+			var arr = [3,6];
+			var random = Math.floor(Math.random() * arr.length);
+			rotateDisc(el, arr[random], '恭喜你，获得红包2元');
+		}
+
+		//转盘旋转方法
+		function rotateDisc(el, random, content){
+			$(el).rotate({
+	            angle:0, 
+	            duration: 10000, 
+	            animateTo: 2160 + 45 * random,
+	            callback:function(){
+					$('.bg_block').show();
+					$('.content').text(content);
+					derail = true;
+	            }
+	        })
+		}
+
+		//无缝滚动
+		var intervalTime = 0;
+		var resulHeight = $('.res ul').height();
+
+		setInterval(function(){
+			intervalTime += resulHeight/5;
+			if(intervalTime <= resulHeight/5*3){
+				scrollInfo(intervalTime);
+			}else{
+				$('.res ul').css('top','0');
+				intervalTime = 0;
+				scrollInfo(intervalTime);
+			}
+		},2000)
+
+		function scrollInfo(intervalTime){
+			$('.res ul').animate({'top': -intervalTime+'px'},500)
+		}
+
+
+		//获取验证码
+		var state = true;
+		var codeClass = 'c_code';
+		var codeText = '获取验证码';
+		function getCode(obj){
+			if(state){
+				if(!parseInt(codeText)){
+					state = false;
+					$(obj)[0].className = 'c_codetime';
+					$(obj)[0].innerText = '60s';
+					calculate(obj);
+				}
+			}else{
+				return false;
+			}
+		}
+		function calculate(obj){
+			var set = setInterval(function(){
+				if(parseInt($(obj)[0].innerText)){
+					$(obj)[0].innerText = (parseInt($(obj)[0].innerText) - 1) + 's';
+				}else{
+					clearInterval(set);
+					$(obj)[0].className = 'c_code';
+					$(obj)[0].innerText = '获取验证码';
+					state = true;
+				}
+			},1000)
+		}
+	</script>
+</body>
+</html># Lucky-draw-page
+# Lucky-draw-page
